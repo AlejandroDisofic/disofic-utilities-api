@@ -1,20 +1,14 @@
-const mysqlConnection = require('../core/db-connection')
+const Order = require('../models/order.model')
 
 class OrdersController {
 
-    constructor(db) {
-        this.db = new mysqlConnection(db);
+    constructor() {
+        this.orderModel = new Order;
     }
 
     getOrders(req, res, next) {
         try {
-            this.db.connect()
-            .then(() => {
-                const fields = Object.values(req.body.fields).join(', ');
-                const conditions = Object.entries(req.body.conditions).map(([key, value]) => `${key}='${value}'`).join(' AND ');
-                const query = `SELECT ${fields} FROM PEDIDOTERMINADOP WHERE ${conditions}`;
-                return this.db.query(query);
-            })
+            this.orderModel.getOrders(req.body)
             .then(results => {
                 res.status(200).json(results)
             });

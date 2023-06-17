@@ -3,9 +3,19 @@ const express = require("express");
 const initRouter = require("./routes/router");
 const config = require("./config/config");
 
+const mysqlConnection = require("./core/db-connection");
+
+const OrderModel = require("./models/order.model")
+
 app = express();
 
-const StartServer = () => {
+this.db = new mysqlConnection();
+this.db.connect().then(() => {
+    startServer();
+    initializeModels();
+})
+
+const startServer = () => {
     app.use((req, res, next) => {
         console.log(
             `Incoming -> Method: [${req.method}] - Url: [${req.url}] - IP: [${req.socket.remoteAddress}]`
@@ -61,4 +71,6 @@ const StartServer = () => {
     );
 };
 
-StartServer();
+const initializeModels = () => {
+    new OrderModel();
+}

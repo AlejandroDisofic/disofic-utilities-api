@@ -3,9 +3,8 @@ const { Client } = require("ssh2");
 const config = require("../config/config");
 
 class mysqlConnection {
-    constructor(db) {
+    constructor() {
         if (!mysqlConnection.instance) {
-            this.db=db
             this.sshClient = new Client();
             mysqlConnection.instance = this;
         }
@@ -29,7 +28,7 @@ class mysqlConnection {
                             port: config.db_config.port,
                             user: config.db_config.username,
                             password: config.db_config.password,
-                            database: config.db_config.database[this.db],
+                            database: config.db_config.database.portal,
                             stream: stream
                         });
                         
