@@ -6,7 +6,7 @@ class OrderErrorController {
         this.orderErrorModel = new OrderError();
     }
 
-    getOrders(req, res, next) {
+    getOrderErrors(req, res, next) {
         try {
             const request = {
                 fields: ['*'],
