@@ -1,11 +1,13 @@
 const http = require("http");
 const express = require("express");
 const initRouter = require("./routes/router");
+const cors = require("cors");
 const config = require("./config/config");
 
 const mysqlConnection = require("./core/db-connection");
 
-const OrderModel = require("./models/order.model")
+const OrderModel = require("./models/order.model");
+const UserModel = require("./models/user.model");
 
 app = express();
 
@@ -28,6 +30,7 @@ const startServer = () => {
         next();
     });
 
+    app.use(cors());
     app.use(express.urlencoded({ extended: true }));
     app.use(express.json());
 
@@ -46,8 +49,6 @@ const startServer = () => {
             );
             return res.status(200).json({});
         }
-
-        // res.header("Cache-Control", "no-cache");
 
         next();
     });
@@ -73,4 +74,5 @@ const startServer = () => {
 
 const initializeModels = () => {
     new OrderModel();
+    new UserModel();
 }

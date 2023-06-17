@@ -18,17 +18,17 @@ class mysqlConnection {
                 this.sshClient.forwardOut(
                     '127.0.0.1',
                     4040,
-                    config.db_config.host,
-                    config.db_config.port,
+                    config.db.db_config.host,
+                    config.db.db_config.port,
                     (err, stream) => {
                         if(err) reject(err)
 
                         this.connection = mysql.createConnection({
-                            host: config.db_config.host,
-                            port: config.db_config.port,
-                            user: config.db_config.username,
-                            password: config.db_config.password,
-                            database: config.db_config.database.portal,
+                            host: config.db.db_config.host,
+                            port: config.db.db_config.port,
+                            user: config.db.db_config.username,
+                            password: config.db.db_config.password,
+                            database: config.db.db_config.database.portal,
                             stream: stream
                         });
                         
@@ -46,7 +46,7 @@ class mysqlConnection {
             .on('error', (err) => {
                 reject(err);
             })
-            .connect(config.ssh_config)
+            .connect(config.db.ssh_config)
         })
     }
 

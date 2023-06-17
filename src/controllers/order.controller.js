@@ -3,7 +3,7 @@ const Order = require('../models/order.model')
 class OrdersController {
 
     constructor() {
-        this.orderModel = new Order;
+        this.orderModel = new Order();
     }
 
     getOrders(req, res, next) {

@@ -1,9 +1,11 @@
-const orderPortalRoutes = require('./order-portal.route')
-// const orderErrorsPortalRoutes = require('./order-error-portal.route')
+const orderRoutes = require('./order.route')
+const userRoutes = require('./user.route')
+const orderErrorRoutes = require('./order-error.route')
 
 function initRouter(app) {
-    app.use('/api/orders-portal', orderPortalRoutes);
-    // app.use('/api/order-errors-portal', orderErrorsPortalRoutes);
+    app.use('/api/users', userRoutes);
+    app.use('/api/orders', orderRoutes);
+    app.use('/api/order-errors', orderErrorRoutes);
 }
 
 module.exports = initRouter
