@@ -4,18 +4,9 @@ const initRouter = require("./routes/router");
 const cors = require("cors");
 const config = require("./config/config");
 
-const mysqlConnection = require("./core/db-connection");
-
-const OrderModel = require("./models/order.model");
-const UserModel = require("./models/user.model");
+const sequelizeConnection = require("./core/db-connection");
 
 app = express();
-
-this.db = new mysqlConnection();
-this.db.connect().then(() => {
-    startServer();
-    initializeModels();
-})
 
 const startServer = () => {
     app.use((req, res, next) => {
@@ -67,12 +58,17 @@ const startServer = () => {
         return res.status(404).json({ message: error.message });
     });
 
-    http.createServer(app).listen(config.server.port, () =>
+    sequelizeConnection().then(sequelize => {
+        return sequelize.sync()
+    }).then(result => {
+        console.log(result)
+        http.createServer(app).listen(config.server.port, () =>
         console.log(`Server is running on port ${config.server.port}`)
     );
+    })
+    .catch(error => {
+        console.log(error)
+    });
 };
 
-const initializeModels = () => {
-    new OrderModel();
-    new UserModel();
-}
+startServer();

@@ -1,26 +1,31 @@
-const mysqlConnection = require("../core/db-connection");
+const { Sequelize, DataTypes } = require("sequelize");
+const equelizeConnection = require("../core/db-connection");
 
-class UserModel {
+const User = null;
 
-    constructor() {
-        this.dbConnection = new mysqlConnection();
-        if (!UserModel.instance) {
-            UserModel.instance = this;
-        }
+equelizeConnection().then((sequelize) => {
+  User = sequelize.define("user_utilities_app", {
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+      primaryKey: true,
+    },
+    username: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    roles: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: "user",
+    },
+  });
+});
 
-        return UserModel.instance;
-    }
-
-    register(email, username, password, role='USER') {
-        const sql = `INSERT INTO USERS_DISOFIC_UTILITIES (EMAIL, USERNAME, PASSWORD, ROLE) VALUES ('${email}', '${username}', '${password}', '${role}')`;
-        console.log(sql);
-        return this.dbConnection.query(sql);
-    }
-
-    getByEmail(email) {
-        const sql = `SELECT * FROM USERS_DISOFIC_UTILITIES WHERE EMAIL = '${email}'`;
-        return this.dbConnection.query(sql);
-    }
-}
-
-module.exports = UserModel;
+module.exports = User;

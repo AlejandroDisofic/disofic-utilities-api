@@ -6,9 +6,7 @@ const config = require("../config/config");
 class UserController {
     maxAge = 3 * 24 * 60 * 60;
 
-    constructor() {
-        this.user = new User();
-    }
+    constructor() {}
 
     register(req, res, next) {
         try {
@@ -22,7 +20,7 @@ class UserController {
                     });
                 }
 
-                return this.user
+                return User
                     .register(email, username, hash, role)
                     .then((result) => {
                         res.status(200).json({
@@ -52,7 +50,7 @@ class UserController {
 
     login(req, res, next) {
         let { email, password } = req.body;
-        this.user
+        User
             .getByEmail(email)
             .then((user) => {
                 if (user.length === 0) {

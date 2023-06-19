@@ -1,64 +1,69 @@
-const mysql = require('mysql2')
+const mysql = require("mysql2");
 const { Client } = require("ssh2");
 const config = require("../config/config");
+const Sequelize = require("sequelize");
 
-class mysqlConnection {
-    constructor() {
-        if (!mysqlConnection.instance) {
-            this.sshClient = new Client();
-            mysqlConnection.instance = this;
-        }
+const sequelizeConfig = {
+  host: config.db.db_config.host,
+  user: config.db.db_config.username,
+  password: config.db.db_config.password,
+  db: config.db.db_config.database.portal,
+  dialect: "mysql",
+  pool: {
+    max: 5,
+    min: 0,
+    acquire: 30000,
+    idle: 10000,
+  },
+};
 
-        return mysqlConnection.instance;
-    }
+const sequelize = new Sequelize(
+  sequelizeConfig.db,
+  sequelizeConfig.user,
+  sequelizeConfig.password,
+  {
+    host: sequelizeConfig.host,
+    dialect: sequelizeConfig.dialect,
+    pool: {
+      max: sequelizeConfig.pool.max,
+      min: sequelizeConfig.pool.min,
+      acquire: sequelizeConfig.pool.acquire,
+      idle: sequelizeConfig.pool.idle,
+    },
+  }
+);
 
-    connect() {
-        return new Promise((resolve, reject) => {
-            this.sshClient.on('ready', () => {
-                this.sshClient.forwardOut(
-                    '127.0.0.1',
-                    4040,
-                    config.db.db_config.host,
-                    config.db.db_config.port,
-                    (err, stream) => {
-                        if(err) reject(err)
+const sequelizeConnection = async () => {
+  return new Promise((resolve, reject) => {
+    const sshClient = new Client();
+    sshClient.on("ready", () => {
+      sshClient
+        .forwardOut(
+          "127.0.0.1",
+          4040,
+          config.db.db_config.host,
+          config.db.db_config.port,
+          (err, stream) => {
+            if (err) reject(err);
 
-                        this.connection = mysql.createConnection({
-                            host: config.db.db_config.host,
-                            port: config.db.db_config.port,
-                            user: config.db.db_config.username,
-                            password: config.db.db_config.password,
-                            database: config.db.db_config.database.portal,
-                            stream: stream
-                        });
-                        
-                        this.connection.connect((err) => {
-                            if (err) {
-                                console.error("Error al conectar a la base de datos:", err)
-                                reject(err);
-                            } else {
-                                resolve();
-                            }
-                        });
-                    }
-                )
-            })
-            .on('error', (err) => {
-                reject(err);
-            })
-            .connect(config.db.ssh_config)
+            const remotePort = stream.localPort;
+
+            sequelize.options.port = remotePort;
+            sequelize.options.dialectOptions = {
+              socketPath: stream.socketPath,
+            };
+
+            sshClient.end();
+
+            resolve(sequelize);
+          }
+        )
+        .on('error', (err) => {
+            reject(err);
         })
-    }
+        .connect(config.db.ssh_config);
+    });
+  });
+};
 
-    query(query) {
-        return new Promise((resolve, reject) => {
-            this.connection.query(query, (err, result) => {
-                if (err) reject(err);
-                resolve(result);
-            });
-        });
-    }
-
-}
-
-module.exports = mysqlConnection;
+module.exports = sequelizeConnection;
